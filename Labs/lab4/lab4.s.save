@@ -1,0 +1,143 @@
+   .global _start
+
+
+   .data
+szA:		.asciz "100"        // Defines a null-terminated ASCII string with different values
+szB:		.asciz "10000"
+szC:		.asciz "10000000"
+szD:		.asciz "10000000000"
+
+szSum:		.skip   21       // Reserves 21 bytes of memory without initializing them (skipping 21 bytes)
+dbA:		.quad 0          // Defines a quadword (8 bytes) initialized to 0
+dbB:		.quad 0
+dbC:		.quad 0
+dbD:		.quad 0
+
+dbSum:		.quad 0
+chLF:		.byte 0xa       // Defines a byte initialized to 0xa (NL line feed, new line)
+szPlus:		.asciz  "  +  "
+szEquals: 	.asciz  "  =  "
+   .text
+
+
+_start:
+   // load and convert szA to dbA
+   ldr   x0, =szA   //x0->address of szA
+   bl    ascint64   //branch and link to ascint54 (cstring->int)
+
+   ldr   x1, =dbA   //loads the address of dbA to x1
+   str   x0, [x1]  //save  the result into dbA
+
+  //print A
+   ldr   x0, =szA    // Load the address of the string szA into register x0
+   bl   putstring    // Call the function putstring to print the null-terminated string
+
+
+  //print +
+   ldr 	 x0, =szPlus  // Load the address of the string szPlus into register x0
+   bl    putstring    // Call the function putstring to print the null-terminated string
+
+  //load and converts szB to dbB
+   ldr   x0, =szB     // Load the address of the string szB into register x0
+   bl    ascint64   //// Call the function ascint64 to convert the null-terminated string to a 64-bit integer
+
+   ldr   x1, =dbB   // Load the address of dbB into register x1
+   str   x0, [x1]   // Store the value in register x0
+  
+   //print B
+   ldr    x0, =szB   // Load the address of the string szB into register x0
+   bl    putstring   // Call the function putstring to print the null-terminated string
+
+
+  //print +
+   ldr   x0, =szPlus  // Load the address of the string szPlus into register x0
+   bl    putstring    // Call the function putstring to print the null-terminated string
+
+  //load and converts szC  to dbC
+   ldr   x0, =szC  // Load the address of the string szC into register x0
+   bl    ascint64   // Call the function ascint64 to convert the null-terminated string to a 64-bit integer
+
+   ldr   x1, =dbC   // Load the address of dbC into register x1
+   str   x0, [x1]   // Store the integer result from x0 into the memory location pointed to by x1 (dbC)
+ 
+  
+   //print C
+   ldr    x0, =szC  // Load the address of the string szC into register x0
+   bl    putstring   // Call the function putstring to print the null-terminated string
+  
+   //print +
+   ldr   x0, =szPlus 
+   bl    putstring   
+
+  //load and converts szD  to dbD
+   ldr   x0, =szD 
+   bl    ascint64  // Call the function ascint64 to convert the null-terminated string to a 64-bit integer
+
+   ldr   x1, =dbD 
+   str   x0, [x1] 
+
+   //print D
+   ldr    x0, =szD
+   bl    putstring
+
+   //print (=) 
+
+
+
+
+//******* dbSum = dbA + dbB + dbC+db****************
+   
+   ldr		x1, =dbA  // X! -> address of dbX
+   ldr	        x1, [x1]   // X1= dbX
+   
+   ldr		x2, =dbB  // X2-> address of dbY
+   ldr		x2,[x2]   // X2 = dby
+   
+
+   ldr		x3, =dbC  // X2-> address of dbY
+   ldr		x3,[x3]   // X2 = dby
+
+   ldr		x4, =dbD  // X2-> address of dbY
+   ldr		x4,[x4]   // X2 = dby
+
+ 
+   add     	x0,x1,x2
+   add      x0,x0,x3
+   add      x0,x0,x4
+
+    //********* store x0 into dbSum ************
+   ldr    	    x5, =dbSum    //x3 is the address of dbSum
+   str          x0, [x5] // the content of x0 is stored in x3
+
+
+   ldr          x1, =szSum
+   bl		       int64asc     //x0 contains the sum , x1 a pointer to where to save
+
+
+
+
+//print the result
+   //print (=) 
+
+   ldr           x0,=szEquals
+   bl            putstring
+
+   ldr 		 x0, =szSum
+   bl 		 putstring
+
+
+//  print new line  
+   ldr 	        x0, =chLF
+   bl           putch
+
+//set up the parameteres to exit the program 
+
+
+
+   mov X0, #0
+   mov X8, #93
+   svc 0
+   .end
+
+
+
